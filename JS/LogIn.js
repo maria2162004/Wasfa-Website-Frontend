@@ -56,15 +56,14 @@ document.addEventListener("DOMContentLoaded", function () {
       const data = await response.json();
 
       if (response.ok) {
-        // Store tokens and user info in localStorage
-        localStorage.setItem("access", data.access);
-        localStorage.setItem("refresh", data.refresh);
+        // Set tokens in cookies (not localStorage)
+        setCookie('access_token', data.access, 1);  // 1 day expiration
+        setCookie('refresh_token', data.refresh, 7); // 7 days expiration
 
-        // Show success message and redirect
-        showCustomAlert(`Login successful!`, "info");
+        showCustomAlert(`Login successful!`);
 
         setTimeout(() => {
-          window.location.href = "../HTML/HomePage.html"; // Redirect to homepage or wherever you want
+          window.location.href = "../HTML/HomePage.html"; // Redirect after successful login
         }, 1000);
       } else {
         console.log("Login failed:", data);
@@ -78,3 +77,10 @@ document.addEventListener("DOMContentLoaded", function () {
     form.reset();
   });
 });
+
+// Function to set a cookie with a specific expiration
+function setCookie(name, value, days) {
+  const date = new Date();
+  date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000)); // Days to milliseconds
+  document.cookie = `${name}=${value}; expires=${date.toUTCString()}; path=/`;
+}
