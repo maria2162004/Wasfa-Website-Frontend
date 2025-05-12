@@ -1,0 +1,141 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "ADLaM Display", system-ui;
+}
+
+::selection {
+  background-color: var(--primary);
+  color: var(--light);
+}
+
+body {
+  background-color: var(--light);
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+.team-page {
+  padding: var(--space-xl) 0;
+}
+
+.page-header {
+  text-align: center;
+  margin-bottom: var(--space-xl);
+}
+
+.page-title {
+  font-size: var(--text-xxl);
+  color: var(--primary);
+  margin-bottom: var(--space-sm);
+}
+
+.page-subtitle {
+  font-size: var(--text-lg);
+  color: gray;
+}
+
+.team-grid {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+  padding: 0 var(--space-md);
+}
+
+.member-card {
+  height: auto;
+  background-color: white;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+  transition: var(--transition-normal);
+  display: flex;
+  padding: var(--space-xl);
+  gap: var(--space-xl);
+}
+
+.card-image {
+  width: 200px;
+  height: 200px;
+  border-radius: var(--radius-full);
+  object-fit: cover;
+  border: 5px solid var(--secondary);
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--transition-normal);
+}
+
+.member-name {
+  font-size: var(--text-xl);
+  font-weight: 600;
+  margin-bottom: var(--space-sm);
+  color: var(--primary);
+}
+
+.member-role {
+  color: gray;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: var(--space-xl);
+  font-weight: 500;
+}
+
+.social-links {
+  display: flex;
+  gap: var(--space-lg);
+}
+
+.social-link {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-full);
+  background-color: var(--light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary);
+  transition: var(--transition-fast);
+}
+
+.social-link:hover {
+  background-color: var(--primary);
+  color: var(--light);
+  transform: translateY(-2px);
+}
+
+.member-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-lg);
+}
+
+.member-card:hover .card-image {
+  transform: scale(1.1);
+}
+
+@media (max-width: 700px) {
+  .member-card {
+    flex-direction: column;
+    text-align: center;
+    gap: var(--space-md);
+  }
+
+  .card-image {
+    margin: 0 auto;
+  }
+
+  .card-content {
+    text-align: center;
+  }
+
+  .social-links {
+    justify-content: center;
+  }
+}

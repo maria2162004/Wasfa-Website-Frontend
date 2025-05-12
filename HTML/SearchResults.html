@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Recipies | Wasfa</title>
+    <!-- Font Awesome -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+    />
+    <!-- Google Font -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=ADLaM+Display&display=swap"
+      rel="stylesheet"
+    />
+    <!-- Favicon -->
+    <link
+      rel="icon"
+      href="../Images/Wasfa.png"
+      type="image/svg+xml"
+      sizes="any"
+    />
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="../CSS/Recipes.css" />
+    <!-- NavBar and Footer Components -->
+    <script src="../JS/Components.js"></script>
+  </head>
+  <body>
+    <!-- Navbar component -->
+    <nav-bar></nav-bar>
+    <section class="search-results-section" style="text-align: center">
+      <h2 class="search-results-title">Search Results</h2>
+      <div class="search-results-count" id="resultsCount"></div>
+
+      <div class="recipe-cards-container">
+        <!-- Search results will be injected here by JavaScript -->
+      </div>
+    </section>
+    <!-- Footer component -->
+    <site-footer></site-footer>
+    <script src="../JS/SearchResults.js"></script>
+  </body>
+</html>

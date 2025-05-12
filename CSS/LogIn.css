@@ -1,0 +1,149 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "ADLaM Display", system-ui;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  width: 100%;
+  background-color: #eeeeee;
+  color: #333;
+}
+
+.border {
+  margin: 30px auto;
+  padding: 60px 30px;
+  width: 90%;
+  max-width: 500px;
+  min-height: auto;
+  background-color: white;
+  border-radius: 16px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.header {
+  color: #7d0a0a;
+  font-size: 28px;
+  font-weight: 600;
+  margin-bottom: 30px;
+  position: relative;
+  display: inline-block;
+}
+
+.header::after {
+  content: "";
+  position: absolute;
+  width: 60%;
+  height: 3px;
+  background: #bf3131;
+  bottom: -8px;
+  left: 20%;
+  border-radius: 2px;
+}
+
+.form2 {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+  flex-grow: 1;
+}
+
+.word {
+  display: block;
+  color: #7d0a0a;
+  font-size: 16px;
+  font-weight: 500;
+  text-align: left;
+  margin-bottom: 5px;
+}
+
+.box2 {
+  width: 100%;
+  padding: 16px 20px;
+  border: 2px solid #bf3131;
+  border-radius: 8px;
+  background: #f9f9f9;
+  font-size: 16px;
+  color: #333;
+  transition: all 0.3s ease;
+  margin-bottom: 8px;
+}
+
+.box2:focus {
+  border-color: #7d0a0a;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(125, 10, 10, 0.2);
+}
+
+.box2::placeholder {
+  color: #888;
+  opacity: 1;
+}
+
+#btn2 {
+  width: 100%;
+  padding: 16px;
+  background: #7d0a0a;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 35px;
+}
+
+#btn2:hover {
+  background: #bf3131;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(191, 49, 49, 0.3);
+}
+
+/* Alert styles */
+.alert {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: white;
+  padding: 15px 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  max-width: 400px;
+  width: auto;
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.alert.hidden {
+  display: none;
+}
+
+.alert button {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 20px;
+  cursor: pointer;
+  margin-left: auto;
+}
+
+@media (max-width: 600px) {
+  .border {
+    padding: 50px 25px;
+    min-height: 600px;
+  }
+}

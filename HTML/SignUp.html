@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sign Up | Wasfa</title>
+    <!-- Font Awesome -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+    />
+    <!-- Google Font -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=ADLaM+Display&display=swap"
+      rel="stylesheet"
+    />
+    <!-- Favicon -->
+    <link
+      rel="icon"
+      href="../Images/Wasfa.png"
+      type="image/svg+xml"
+      sizes="any"
+    />
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="../CSS/SignUp.css" />
+    <!-- NavBar and Footer Components -->
+    <script src="../JS/Components.js"></script>
+  </head>
+  <body>
+    <!-- Navbar component -->
+    <nav-bar></nav-bar>
+
+    <div class="border">
+      <h1 class="header">Sign Up</h1>
+
+      <div class="form">
+        <form id="signupForm">
+          <label for="name">Name:</label>
+          <input type="text" class="box" name="name" id="name" required />
+          <div id="nameError" class="error-message"></div>
+
+          <label for="email">Email:</label>
+          <input type="email" class="box" name="email" id="email" required />
+          <div id="emailError" class="error-message"></div>
+
+          <label for="password">Password:</label>
+          <input
+            type="password"
+            class="box"
+            name="password"
+            id="password"
+            required
+          />
+          <div id="passwordError" class="error-message"></div>
+
+          <label for="confirmpassword">Confirm Password:</label>
+          <input
+            type="password"
+            class="box"
+            name="confirmpassword"
+            id="confirmpassword"
+            required
+          />
+          <div id="confirmPasswordError" class="error-message"></div>
+
+          <label for="phonenumber">Phone Number:</label>
+          <input
+            type="tel"
+            class="box"
+            name="phonenumber"
+            id="phonenumber"
+            required
+          />
+          <div id="phoneError" class="error-message"></div>
+
+          <label class="role-label">Role:</label>
+          <div class="radio-container">
+            <label class="radio-option">
+              <input
+                type="radio"
+                id="userRole"
+                name="role"
+                value="Admin"
+                required
+              />
+              <span class="radio-custom"></span>
+              <span class="radio-label">Admin</span>
+            </label>
+            <label class="radio-option">
+              <input
+                type="radio"
+                id="adminRole"
+                name="role"
+                value="User"
+                required
+              />
+              <span class="radio-custom"></span>
+              <span class="radio-label">User</span>
+            </label>
+          </div>
+
+          <button type="submit" value="Signed Up" id="btn">Sign Up</button>
+        </form>
+      </div>
+    </div>
+
+    <!--for the Alert in JS-->
+    <div id="customAlert" class="custom-alert hidden">
+      <p id="alertMessage">This is a custom alert.</p>
+      <button id="closeAlert">OK</button>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../JS/SignUp.js"></script>
+  </body>
+</html>

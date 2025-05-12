@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Recipe Details</title>
+
+    <!-- Font Awesome -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+    />
+    <!-- Google Font -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=ADLaM+Display&display=swap"
+      rel="stylesheet"
+    />
+    <!-- Favicon -->
+    <link
+      rel="icon"
+      href="../Images/Wasfa.png"
+      type="image/svg+xml"
+      sizes="any"
+    />
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="../CSS/RecipeDetails.css" />
+    <!-- NavBar and Footer Components -->
+    <script src="../JS/Components.js"></script>
+  </head>
+
+  <body>
+    <!-- Navbar component -->
+    <nav-bar></nav-bar>
+
+    <main class="content-container">
+      <button class="back-button" id="back-btn">
+        <i class="fas fa-arrow-left"></i> Back to Recipes
+      </button>
+
+      <div class="recipe-layout">
+        <!-- Image and description container -->
+        <div class="recipe-description">
+          <img id="recipe-img" src="" alt="Recipe Image" class="recipe-image" />
+          <br />
+          <!-- Header with title and favorite button -->
+          <div class="recipe-header">
+            <h1 id="recipe-title"></h1>
+            <div class="recipe-actions">
+              <button id="edit-btn" class="edit-btn" style="display: none">
+                <i class="fas fa-edit"></i> Edit Recipe
+              </button>
+              <button id="favorite-btn" class="favorite-btn">
+                <i class="far fa-heart"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Meta Information (e.g., Course Name) -->
+          <div class="recipe-meta">
+            <section id="recipe-category"></section>
+          </div>
+          <p id="recipe-description"></p>
+        </div>
+
+        <!-- Ingredients and Method -->
+        <div class="recipe-content">
+          <div id="ing">
+            <h2>Ingredients</h2>
+            <ul id="recipe-ingredients"></ul>
+          </div>
+          <hr />
+          <br />
+          <div id="meth">
+            <h2>Method</h2>
+            <ol id="recipe-method"></ol>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Footer component -->
+    <site-footer></site-footer>
+
+    <!-- Scripts -->
+    <script src="../JS/RecipeDetails.js"></script>
+  </body>
+</html>

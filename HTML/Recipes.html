@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Recipes | Wasfa</title>
+
+    <!-- Font Awesome -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+    />
+
+    <!-- Google Font -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=ADLaM+Display&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Favicon -->
+    <link
+      rel="icon"
+      href="../Images/Wasfa.png"
+      type="image/svg+xml"
+      sizes="any"
+    />
+
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="../CSS/Recipes.css" />
+    <!-- NavBar and Footer Components -->
+    <script src="../JS/Components.js"></script>
+  </head>
+  <body>
+    <!-- Navbar component -->
+    <nav-bar></nav-bar>
+
+    <!-- Recipes Section -->
+    <section class="recipes-section">
+      <h2 class="recipes-title" id="sectionTitle">All Recipes</h2>
+      <div class="search-results-count" id="resultsCount"></div>
+
+      <div class="recipe-categories">
+        <button class="category-button active" data-category="all">All</button>
+        <button class="category-button" data-category="appetizers">
+          Appetizers
+        </button>
+        <button class="category-button" data-category="main course">
+          Main Course
+        </button>
+        <button class="category-button" data-category="dessert">
+          Dessert
+        </button>
+      </div>
+
+      <div class="recipe-cards-container">
+        <!-- Recipe cards will be injected here by JavaScript -->
+      </div>
+    </section>
+
+    <!-- Scroll Butoon component -->
+    <scroll-button></scroll-button>
+
+    <!-- Footer component -->
+    <site-footer></site-footer>
+
+    <!-- Scripts -->
+    <script src="../JS/Recipes.js"></script>
+  </body>
+</html>

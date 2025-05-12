@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Add new recipes to Wasfa" />
+    <title>Add Recipe | Wasfa</title>
+    <!-- Font Awesome -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+    />
+    <!-- Google Font -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=ADLaM+Display&display=swap"
+      rel="stylesheet"
+    />
+    <!-- Favicon -->
+    <link
+      rel="icon"
+      href="../Images/Wasfa.png"
+      type="image/svg+xml"
+      sizes="any"
+    />
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="../CSS/AddRecipe.css" />
+    <link rel="stylesheet" href="../CSS/variables.css" />
+    <!-- NavBar and Footer Components -->
+    <script src="../JS/Components.js"></script>
+  </head>
+
+  <body>
+    <!-- Navbar component -->
+    <nav-bar></nav-bar>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast"></div>
+
+    <main class="add-recipe-page">
+      <!-- header -->
+      <header class="page-header">
+        <h1 class="page-title">Add New Recipe</h1>
+        <p class="page-subtitle">
+          Share your delicious creations with the Wasfa community
+        </p>
+      </header>
+
+      <div class="recipe-form-container">
+        <form id="recipeForm" class="form-card" enctype="multipart/form-data">
+          <h2 class="form-title">Recipe Information</h2>
+
+          <!-- Recipe Photo -->
+          <div class="form-group">
+            <label for="recipePhoto">Recipe Photo</label>
+            <div class="photo-upload-container">
+              <div class="photo-preview-container" id="photoPreviewContainer">
+                <img
+                  id="photoPreview"
+                  class="photo-preview"
+                  src=""
+                  alt="Recipe preview"
+                />
+                <span class="photo-placeholder">
+                  <i class="fas fa-camera"></i>
+                  <span>No photo selected</span>
+                </span>
+                <button
+                  type="button"
+                  class="remove-photo-btn"
+                  id="removePhotoBtn"
+                >
+                  <i class="fas fa-times"></i>
+                </button>
+              </div>
+              <input
+                type="file"
+                id="recipePhoto"
+                name="recipePhoto"
+                accept="image/*"
+                class="photo-input"
+              />
+              <label for="recipePhoto" class="photo-upload-btn">
+                <i class="fas fa-cloud-upload-alt"></i> Choose Photo
+              </label>
+            </div>
+          </div>
+
+          <!-- Recipe Id -->
+          <div class="form-group">
+            <label for="recipeId">Recipe ID*</label>
+            <div class="input">
+              <input
+                type="text"
+                id="recipeId"
+                name="recipeId"
+                required
+                placeholder="Enter unique recipe identifier"
+              />
+            </div>
+          </div>
+
+          <!-- Recipe Name -->
+          <div class="form-group">
+            <label for="recipeName">Recipe Name*</label>
+            <div class="input">
+              <input
+                type="text"
+                id="recipeName"
+                name="recipeName"
+                required
+                placeholder="Enter recipe name"
+              />
+            </div>
+          </div>
+
+          <!-- Course Type -->
+          <div class="form-group">
+            <label for="courseType">Course Type*</label>
+            <select id="courseType" name="courseType" required>
+              <option value="">Select a course type</option>
+              <option value="appetizers">Appetizers</option>
+              <option value="main course">Main Course</option>
+              <option value="dessert">Dessert</option>
+            </select>
+          </div>
+
+          <!-- Recipe Description -->
+          <div class="form-group">
+            <label for="recipeDescription">Description*</label>
+            <div class="input">
+              <textarea
+                id="recipeDescription"
+                name="recipeDescription"
+                required
+                placeholder="Enter recipe Description.."
+              ></textarea>
+            </div>
+          </div>
+
+          <!-- Method Section -->
+          <div class="form-group">
+            <label>Method Steps*</label>
+            <div class="method-section" id="methodSection">
+              <!-- Method Step -->
+              <div class="method-step">
+                <div class="method-step-number">1</div>
+                <div class="method-step-content">
+                  <textarea
+                    name="methodStep[]"
+                    placeholder="Enter step description"
+                    required
+                  ></textarea>
+                </div>
+
+                <!-- Remove Step Button -->
+                <button
+                  type="button"
+                  class="remove-method-btn"
+                  style="display: none"
+                >
+                  <i class="fas fa-times"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- Add Step Button -->
+            <button type="button" class="btn btn-add-method" id="addMethodBtn">
+              <i class="fas fa-plus"></i> Add Step
+            </button>
+          </div>
+
+          <!-- Ingredients Section -->
+          <div class="form-group">
+            <label>Ingredients*</label>
+            <div class="ingredient-section" id="ingredientSection">
+              <div class="ingredient-row">
+                <!-- Ingredient Id -->
+                <div class="input">
+                  <input
+                    type="text"
+                    name="ingredientId[]"
+                    placeholder="Ingredient ID"
+                    required
+                  />
+                </div>
+
+                <!-- Ingredient Name -->
+                <div class="input">
+                  <input
+                    type="text"
+                    name="ingredientName[]"
+                    placeholder="Ingredient Name"
+                    required
+                  />
+                </div>
+
+                <!-- Ingredient Quantity -->
+                <div class="input">
+                  <input
+                    type="text"
+                    name="ingredientQuantity[]"
+                    placeholder="Quantity"
+                    required
+                  />
+                </div>
+
+                <!-- Unit Selection -->
+                <div class="input">
+                  <select name="ingredientUnit[]" required>
+                    <option value="grams">grams</option>
+                    <option value="cups">cups</option>
+                    <option value="ml">ml</option>
+                    <option value="teaspoon">teaspoon</option>
+                    <option value="tablespoon">tablespoon</option>
+                    <option value="pieces">pieces</option>
+                  </select>
+                </div>
+
+                <!-- Remove button for the first row (hidden) -->
+                <button
+                  type="button"
+                  class="remove-ingredient-btn"
+                  style="display: none"
+                >
+                  <i class="fas fa-times"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- Add Ingredient Button -->
+            <button
+              id="add_ingredient_button"
+              type="button"
+              class="btn btn-add-ingredient"
+            >
+              <i class="fas fa-plus"></i> Add Ingredient
+            </button>
+          </div>
+
+          <!-- Submit & Reset Buttons -->
+          <div class="btn-group">
+            <button id="submit_button" type="submit" class="btn">
+              Save Recipe
+            </button>
+            <button type="reset" class="btn btn-secondary">Reset Form</button>
+          </div>
+        </form>
+      </div>
+    </main>
+    <script src="../JS/AddRecipe.js"></script>
+  </body>
+</html>

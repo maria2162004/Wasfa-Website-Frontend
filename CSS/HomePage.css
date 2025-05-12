@@ -1,0 +1,145 @@
+* {
+  margin: 0;
+  padding: 0;
+  font-family: "ADLaM Display", system-ui;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: rgb(238, 238, 238);
+  color: #333;
+}
+
+/* Hero Section */
+body > section:nth-of-type(1) {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  padding: 60px 40px;
+  background: linear-gradient(
+      135deg,
+      rgba(125, 10, 10, 0.85) 0%,
+      rgba(191, 49, 49, 0.85) 100%
+    ),
+    url("../Images/Hero-BG.avif") repeat;
+  color: white;
+  position: relative;
+}
+
+body > section:nth-of-type(1) > div {
+  background-color: rgb(238, 238, 238);
+  text-align: center;
+  padding: 40px 30px;
+  border-radius: 15px;
+  width: 60%;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  color: #7d0a0a;
+  transition: transform 0.3s ease;
+}
+
+body > section:nth-of-type(1) > div:hover {
+  transform: translateY(-5px);
+}
+
+body > section:nth-of-type(1) > div h1 {
+  font-size: 2.2em;
+  margin-bottom: 15px;
+}
+
+body > section:nth-of-type(1) > div p {
+  font-size: 1.2em;
+  margin-bottom: 25px;
+}
+
+body > section:nth-of-type(1) > div button {
+  background-color: #7d0a0a;
+  color: white;
+  padding: 12px 30px;
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  font-size: 1.1em;
+  transition: all 0.3s ease;
+}
+
+body > section:nth-of-type(1) > div button:hover {
+  background-color: #5a0000;
+  transform: translateY(-3px);
+}
+
+/* Recipe Sections */
+body > section:nth-of-type(2) {
+  text-align: center;
+  padding: 80px 20px;
+}
+
+body > section:nth-of-type(2) h2 {
+  font-size: 2.5em;
+  margin-bottom: 40px;
+  color: #7d0a0a;
+}
+
+body > section:nth-of-type(2) > div {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 30px;
+  margin-bottom: 60px;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+body > section:nth-of-type(2) > div > div {
+  background: white;
+  padding: 0;
+  border-radius: 12px;
+  width: 280px;
+  text-align: center;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  transition: all 0.4s ease;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Red Gradient Line Above Cards */
+body > section:nth-of-type(2) > div > div::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 5px;
+  background-color: #7d0a0a;
+  z-index: 2;
+}
+
+body > section:nth-of-type(2) > div > div:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+}
+
+body > section:nth-of-type(2) > div > div img {
+  width: 100%;
+  border-radius: 12px 12px 0 0;
+  aspect-ratio: 1;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+  display: block;
+}
+
+body > section:nth-of-type(2) > div > div:hover img {
+  transform: scale(1.05);
+}
+
+body > section:nth-of-type(2) > div > div h3 {
+  color: #7d0a0a;
+  margin: 20px 0 10px;
+  padding: 0 15px;
+}
+
+body > section:nth-of-type(2) > div > div p {
+  margin: 0 0 20px;
+  padding: 0 15px;
+  color: #666;
+}
