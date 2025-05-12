@@ -25,7 +25,6 @@ document.addEventListener("DOMContentLoaded", () => {
       document.getElementById("recipe-img").alt = recipe.name;
       document.getElementById("recipe-title").textContent = recipe.name;
       document.getElementById("recipe-description").textContent = `Description: ${recipe.description}`;
-      document.getElementById("recipe-category").textContent = `Category: ${recipe.category}`;
 
       // Ingredients
       const ingredientList = document.getElementById("recipe-ingredients");

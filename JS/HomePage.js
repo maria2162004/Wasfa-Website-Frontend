@@ -45,8 +45,7 @@ function createRecipeCard(recipe) {
     `;
     
     card.addEventListener("click", () => {
-        localStorage.setItem("selectedRecipeId", recipe.id);
-        window.location.href = "RecipeDetails.html";
+        window.location.href = `RecipeDetails.html?id=${recipe.id}`;
     });
     
     return card;
