@@ -59,7 +59,7 @@ form.addEventListener("submit", async function (event) {
       name: name_value,
       email: email_value,
       password: password_value,
-      confirm_password: confirmpassword_value, // ✅ Fix here
+      confirm_password: confirmpassword_value,
       phone: phone_value,
     };
 
@@ -75,15 +75,15 @@ form.addEventListener("submit", async function (event) {
       const data = await response.json();
 
       if (response.ok) {
-        // Save tokens to localStorage
-        localStorage.setItem("access", data.tokens.access);
-        localStorage.setItem("refresh", data.tokens.refresh);
+        // Set tokens in cookies (not localStorage)
+        setCookie('access_token', data.tokens.access, 1);  // 1 day expiration
+        setCookie('refresh_token', data.tokens.refresh, 7); // 7 days expiration
 
         showAlert("Sign Up Successfully!");
         form.reset();
 
         setTimeout(() => {
-          window.location.href = "../HTML/HomePage.html";
+          window.location.href = "../HTML/HomePage.html"; // Redirect after successful sign-up
         }, 2000);
       } else {
         console.log("Error details from server:", JSON.stringify(data, null, 2));
@@ -105,16 +105,19 @@ form.addEventListener("submit", async function (event) {
   }
 });
 
+// Function to validate email
 function ValidateEmail(email_value) {
   const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   return regex.test(email_value);
 }
 
+// Function to validate phone number
 function ValidatePhone(phone_value) {
   const regex = /^01[0125][0-9]{8}$/;
   return regex.test(phone_value);
 }
 
+// Function to show error messages below the input fields
 function showError(inputElement, message) {
   const errorElement = document.createElement("div");
   errorElement.classList.add("error-message");
@@ -123,18 +126,28 @@ function showError(inputElement, message) {
   inputElement.parentNode.insertBefore(errorElement, inputElement.nextSibling);
 }
 
+// Clear error messages
 function clearErrorMessages() {
   const errorMessages = document.querySelectorAll(".error-message");
   errorMessages.forEach((message) => message.remove());
 }
 
+// Show alert message (e.g., successful signup)
 function showAlert(message) {
   alertMessage.textContent = message;
   alertBox.classList.add("show");
   document.body.style.overflow = "hidden";
 }
 
+// Close alert box
 document.getElementById("closeAlert").addEventListener("click", function () {
   alertBox.classList.remove("show");
   document.body.style.overflow = "auto";
 });
+
+// Function to set a cookie with a specific expiration
+function setCookie(name, value, days) {
+  const date = new Date();
+  date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000)); // Days to milliseconds
+  document.cookie = `${name}=${value}; expires=${date.toUTCString()}; path=/`;
+}
