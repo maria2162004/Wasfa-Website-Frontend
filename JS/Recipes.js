@@ -1,5 +1,5 @@
 const API_URL = "http://127.0.0.1:8000/api/recipes/";
-
+//recipies page
 let recipes = [];
 // load from localStorage or use default ones
 // let savedRecipes = JSON.parse(localStorage.getItem("recipes")) || [];
