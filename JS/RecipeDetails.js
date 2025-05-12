@@ -48,7 +48,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
       // Favorite button logic
       const favoriteBtn = document.getElementById("favorite-btn");
-      
+      if (!favoriteBtn) {
+        console.error("Favorite button not found!");
+        return; // Exit if the button isn't found
+      }
+
+      console.log("Favorite button exists, setting up click handler...");
+
       if (recipe.isFav) {
         favoriteBtn.innerHTML = '<i class="fas fa-heart"></i>';
         favoriteBtn.classList.add("favorited");
@@ -59,13 +65,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
       // Toggle favorite on click
       favoriteBtn.addEventListener("click", () => {
+        console.log("Favorite button clicked");
         const newFavStatus = !recipe.isFav; // Toggle favorite status
+
         fetch(API_URL, {
           method: "PATCH",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ isFav: newFavStatus }),
+          body: JSON.stringify({ isFav: newFavStatus }), // Send the updated favorite status
         })
           .then((response) => response.json())
           .then((updatedRecipe) => {
