@@ -1,9 +1,7 @@
 const API_URL = "http://127.0.0.1:8000/api/recipes/";
-const DEFAULT_IMAGE = "../Images/default-recipe.jpg";
 
 let recipes = [];
 
-// Homepage sections configuration (matches your HTML structure)
 const homepageSections = {
     mostViewed: { title: "Most Viewed Recipes" },
     middleEast: { title: "Most Popular Recipes in the Middle East" },
@@ -17,13 +15,11 @@ async function loadRecipes() {
         if (!response.ok) throw new Error("Network response was not ok");
         const allRecipes = await response.json();
         
-        // Filter recipes to only include our target categories
         recipes = allRecipes.filter(recipe => 
             ['mostViewed', 'middleEast', 'asia', 'europe'].includes(recipe.category)
         ).map(recipe => ({
             ...recipe,
-            image: recipe.image || DEFAULT_IMAGE,
-            views: recipe.views || 0
+            image: recipe.image,
         }));
         
         return recipes;
@@ -38,8 +34,7 @@ function createRecipeCard(recipe) {
     card.className = "recipe-card";
     
     card.innerHTML = `
-        <img src="${recipe.image}" alt="${recipe.name}" 
-             onerror="this.src='${DEFAULT_IMAGE}'">
+        <img src="${recipe.image}" alt="${recipe.name}">
         <h3>${recipe.name}</h3>
         <p>${recipe.description}</p>
     `;
@@ -67,12 +62,6 @@ function renderHomepageSections() {
             recipe => recipe.category === sectionId
         );
         
-        // For most viewed, sort by views
-        if (sectionId === "mostViewed") {
-            sectionRecipes.sort((a, b) => b.views - a.views);
-        }
-        
-        // Add recipes to section (limit to 4 as per your design)
         sectionRecipes.slice(0, 4).forEach(recipe => {
             container.appendChild(createRecipeCard(recipe));
         });
