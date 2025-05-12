@@ -23,7 +23,7 @@ document.addEventListener("DOMContentLoaded", function () {
     document.getElementById("custom-alert").classList.add("hidden");
   });
 
-  form.addEventListener("submit", function (event) {
+  form.addEventListener("submit", async function (event) {
     event.preventDefault();
 
     const email_value = form.elements["email"].value.trim();
@@ -34,34 +34,45 @@ document.addEventListener("DOMContentLoaded", function () {
       password_value,
     });
 
-    let users = JSON.parse(localStorage.getItem("users")) || [];
-    console.log("Stored users:", users);
+    // Validate the inputs
+    if (!email_value || !password_value) {
+      showCustomAlert("Please enter both email and password", "error");
+      return;
+    }
 
-    const found_user = users.find(
-      (user) =>
-        user.email.toLowerCase() === email_value.toLowerCase() &&
-        user.password === password_value
-    );
+    try {
+      // Send login request to Django backend
+      const response = await fetch("http://127.0.0.1:8000/api/auth/login/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: email_value,
+          password: password_value,
+        }),
+      });
 
-    if (found_user) {
-      console.log("User found:", found_user);
-      const loggedInUser = {
-        name: found_user.name,
-        email: found_user.email,
-        isAdmin: found_user.isAdmin,
-        isLoggedIn: true,
-      };
+      const data = await response.json();
 
-      localStorage.setItem("user", JSON.stringify(loggedInUser));
+      if (response.ok) {
+        // Store tokens and user info in localStorage
+        localStorage.setItem("access", data.access);
+        localStorage.setItem("refresh", data.refresh);
 
-      showCustomAlert(`Login successful! Welcome ${found_user.name}`);
+        // Show success message and redirect
+        showCustomAlert(`Login successful!`, "info");
 
-      setTimeout(() => {
-        window.location.href = "../HTML/HomePage.html";
-      }, 1000);
-    } else {
-      console.log("Login failed - no matching user found");
-      showCustomAlert("Invalid email or password. Please try again.", "error");
+        setTimeout(() => {
+          window.location.href = "../HTML/HomePage.html"; // Redirect to homepage or wherever you want
+        }, 1000);
+      } else {
+        console.log("Login failed:", data);
+        showCustomAlert("Invalid email or password. Please try again.", "error");
+      }
+    } catch (error) {
+      console.error("Login error:", error);
+      showCustomAlert("An error occurred while logging in. Please try again.", "error");
     }
 
     form.reset();

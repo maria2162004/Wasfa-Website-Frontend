@@ -7,11 +7,11 @@ const inputphone = document.getElementById("phonenumber");
 const alertBox = document.getElementById("customAlert");
 const alertMessage = document.getElementById("alertMessage");
 
-form.addEventListener("submit", function (event) {
+form.addEventListener("submit", async function (event) {
   event.preventDefault();
 
   const name_value = inputname.value.trim();
-  const email_value = inputemail.value.trim();
+  const email_value = inputemail.value.trim().toLowerCase();
   const password_value = inputpassword.value;
   const confirmpassword_value = inputconfirmpassword.value;
   const phone_value = inputphone.value.trim();
@@ -20,7 +20,6 @@ form.addEventListener("submit", function (event) {
     : null;
 
   let valid = true;
-
   clearErrorMessages();
 
   if (name_value === "") {
@@ -56,43 +55,53 @@ form.addEventListener("submit", function (event) {
   }
 
   if (valid) {
-    const user = {
+    const userData = {
       name: name_value,
-      email: email_value.toLowerCase(),
+      email: email_value,
       password: password_value,
+      confirm_password: confirmpassword_value, // ✅ Fix here
       phone: phone_value,
-      role: role_value,
-      isAdmin: role_value.toLowerCase() === "admin",
     };
 
-    let users = JSON.parse(localStorage.getItem("users")) || [];
+    try {
+      const response = await fetch("http://127.0.0.1:8000/api/auth/register/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(userData),
+      });
 
-    // Check for existing email
-    const emailExists = users.some((u) => u.email === user.email);
-    if (emailExists) {
-      showError(inputemail, "Email is already registered.");
-      return;
+      const data = await response.json();
+
+      if (response.ok) {
+        // Save tokens to localStorage
+        localStorage.setItem("access", data.tokens.access);
+        localStorage.setItem("refresh", data.tokens.refresh);
+
+        showAlert("Sign Up Successfully!");
+        form.reset();
+
+        setTimeout(() => {
+          window.location.href = "../HTML/HomePage.html";
+        }, 2000);
+      } else {
+        console.log("Error details from server:", JSON.stringify(data, null, 2));
+
+        if (data.email) showError(inputemail, data.email[0]);
+        if (data.name) showError(inputname, data.name[0]);
+        if (data.password) showError(inputpassword, data.password[0]);
+        if (data.confirm_password) showError(inputconfirmpassword, data.confirm_password[0]);
+        if (data.phone) showError(inputphone, data.phone[0]);
+
+        if (!data.email && !data.name && !data.password && !data.phone && !data.confirm_password) {
+          showAlert("Signup failed. Check your info.");
+        }
+      }
+    } catch (error) {
+      console.error("Signup Error:", error);
+      showAlert("An error occurred during signup.");
     }
-
-    users.push(user);
-    localStorage.setItem("users", JSON.stringify(users));
-
-    // Log the user in automatically
-    const loggedInUser = {
-      name: user.name,
-      email: user.email,
-      role: user.role,
-      isAdmin: user.isAdmin,
-      isLoggedIn: true,
-    };
-    localStorage.setItem("user", JSON.stringify(loggedInUser));
-
-    showAlert("Sign Up Successfully!");
-    form.reset();
-
-    setTimeout(() => {
-      window.location.href = "../HTML/HomePage.html";
-    }, 2000);
   }
 });
 
