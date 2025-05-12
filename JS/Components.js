@@ -1,3 +1,27 @@
+// Utility function to decode JWT and extract payload
+function decodeToken(token) {
+  try {
+    const payload = JSON.parse(atob(token.split(".")[1]));
+    return payload;
+  } catch (error) {
+    console.error("Invalid token", error);
+    return null;
+  }
+}
+
+// Utility function to check if the user is an admin
+function isAdmin() {
+  const accessToken = document.cookie
+    .split("; ")
+    .find((row) => row.startsWith("access_token="))
+    ?.split("=")[1];
+
+  if (!accessToken) return false;
+
+  const payload = decodeToken(accessToken);
+  return payload?.is_admin || false;
+}
+
 // Navbar Component
 class NavBar extends HTMLElement {
   connectedCallback() {
@@ -190,47 +214,64 @@ class NavBar extends HTMLElement {
   }
 
   updateAuthButtons() {
-    const user = JSON.parse(localStorage.getItem("user"));
+    const accessToken = this.getCookie("access_token");
+    const refreshToken = this.getCookie("refresh_token");
     const authButtons = this.querySelector("#authButtons");
 
-    if (user && user.isLoggedIn) {
+    if (accessToken && refreshToken) {
+      // Decode token to get user info
+      const payload = decodeToken(accessToken);
+      const user = { isAdmin: payload.is_admin };
+
       authButtons.innerHTML = `
-        ${
-          !user.isAdmin
-            ? `
-          <a href="../HTML/FavoriteRecipes.html">
-            <button type="button" style="background: none; border: none; cursor: pointer;">
-              <img src="../Images/favouriteicon.png" alt="Favourites" style="width: 60px; margin-right:10px" />
-            </button>
-          </a>
-        `
-            : ""
-        }
-        ${
-          user.isAdmin
-            ? `
-          <a href="../HTML/AddRecipe.html">
-            <button type="button" style="background: none; border: none; cursor: pointer;">
-              <img src="../Images/addicon.png" alt="Add" style="width: 60px; margin-right:10px" />
-            </button>
-          </a>
-        `
-            : ""
-        }
-        <button type="button" id="logoutBtn">Logout</button>
-      `;
+            ${
+              !user.isAdmin
+                ? `
+            <a href="../HTML/FavoriteRecipes.html">
+                <button type="button" style="background: none; border: none; cursor: pointer;">
+                    <img src="../Images/favouriteicon.png" alt="Favourites" style="width: 60px; margin-right:10px" />
+                </button>
+            </a>
+            `
+                : ""
+            }
+            ${
+              user.isAdmin
+                ? `
+            <a href="../HTML/AddRecipe.html">
+                <button type="button" style="background: none; border: none; cursor: pointer;">
+                    <img src="../Images/addicon.png" alt="Add" style="width: 60px; margin-right:10px" />
+                </button>
+            </a>
+            `
+                : ""
+            }
+            <button type="button" id="logoutBtn">Logout</button>
+        `;
 
       const logoutBtn = document.getElementById("logoutBtn");
       logoutBtn.addEventListener("click", () => {
-        localStorage.removeItem("user");
+        this.deleteCookie("access_token");
+        this.deleteCookie("refresh_token");
         location.reload();
       });
     } else {
       authButtons.innerHTML = `
-        <a href="../HTML/SignUp.html"><button type="button">Sign Up</button></a>
-        <a href="../HTML/LogIn.html"><button type="button">Login</button></a>
-      `;
+            <a href="../HTML/SignUp.html"><button type="button">Sign Up</button></a>
+            <a href="../HTML/LogIn.html"><button type="button">Login</button></a>
+        `;
     }
+  }
+
+  getCookie(name) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(";").shift();
+    return null;
+  }
+
+  deleteCookie(name) {
+    document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
   }
 }
 

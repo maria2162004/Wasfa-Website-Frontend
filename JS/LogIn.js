@@ -56,9 +56,9 @@ document.addEventListener("DOMContentLoaded", function () {
       const data = await response.json();
 
       if (response.ok) {
-        // Set tokens in cookies (not localStorage)
-        setCookie('access_token', data.access, 1);  // 1 day expiration
-        setCookie('refresh_token', data.refresh, 7); // 7 days expiration
+        // Set tokens in cookies
+        setCookie("access_token", data.access, 1); // 1 day expiration
+        setCookie("refresh_token", data.refresh, 7); // 7 days expiration
 
         showCustomAlert(`Login successful!`);
 
@@ -67,11 +67,17 @@ document.addEventListener("DOMContentLoaded", function () {
         }, 1000);
       } else {
         console.log("Login failed:", data);
-        showCustomAlert("Invalid email or password. Please try again.", "error");
+        showCustomAlert(
+          "Invalid email or password. Please try again.",
+          "error"
+        );
       }
     } catch (error) {
       console.error("Login error:", error);
-      showCustomAlert("An error occurred while logging in. Please try again.", "error");
+      showCustomAlert(
+        "An error occurred while logging in. Please try again.",
+        "error"
+      );
     }
 
     form.reset();
@@ -81,6 +87,6 @@ document.addEventListener("DOMContentLoaded", function () {
 // Function to set a cookie with a specific expiration
 function setCookie(name, value, days) {
   const date = new Date();
-  date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000)); // Days to milliseconds
+  date.setTime(date.getTime() + days * 24 * 60 * 60 * 1000); // Days to milliseconds
   document.cookie = `${name}=${value}; expires=${date.toUTCString()}; path=/`;
 }

@@ -25,37 +25,54 @@ document.addEventListener("DOMContentLoaded", function () {
   const recipeIdToEdit = urlParams.get("id");
   // --------------------------------------------
 
-  // Initialize recipes array from localStorage
-  let recipes = JSON.parse(localStorage.getItem("recipes")) || [];
+  // Initialize recipes array from backend API
+  let recipes = [];
   // --------------------------------------------
 
-  // Find the recipe to edit
-  const recipeToEdit = recipes.find(
-    (recipe) => recipe.recipeId === recipeIdToEdit
-  );
-  // --------------------------------------------
-
-  // If recipe not found, redirect
-  if (!recipeToEdit) {
-    showToast("Recipe not found", "error");
-    setTimeout(() => {
-      window.location.href = "../HTML/Recipes.html";
-    }, 2000);
-    return;
-  }
+  // Fetch the recipe to edit from backend API
+  let recipeToEdit = null;
+  fetch(`http://127.0.0.1:8000/api/recipes/${recipeIdToEdit}/`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${
+        document.cookie
+          .split("; ")
+          .find((row) => row.startsWith("access_token="))
+          .split("=")[1]
+      }`,
+    },
+  })
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error("Failed to fetch recipe");
+      }
+      return response.json();
+    })
+    .then((data) => {
+      recipeToEdit = data;
+      populateForm();
+    })
+    .catch((error) => {
+      console.error("Error fetching recipe:", error);
+      showToast("Recipe not found", "error");
+      setTimeout(() => {
+        window.location.href = "../HTML/Recipes.html";
+      }, 2000);
+    });
   // --------------------------------------------
 
   // Populate form with recipe data
   function populateForm() {
-    document.getElementById("recipeId").value = recipeToEdit.recipeId;
-    document.getElementById("recipeName").value = recipeToEdit.recipeName;
-    document.getElementById("courseType").value = recipeToEdit.courseType;
+    document.getElementById("recipeId").value = recipeToEdit.id;
+    document.getElementById("recipeName").value = recipeToEdit.name;
+    document.getElementById("courseType").value = recipeToEdit.course_type;
     document.getElementById("recipeDescription").value =
-      recipeToEdit.recipeDescription;
+      recipeToEdit.description;
 
     // Populate photo if exists
-    if (recipeToEdit.photo) {
-      photoPreview.src = recipeToEdit.photo;
+    if (recipeToEdit.image) {
+      photoPreview.src = recipeToEdit.image;
       photoPreview.style.display = "block";
       photoPlaceholder.style.display = "none";
       removePhotoBtn.style.display = "flex";
@@ -70,38 +87,38 @@ document.addEventListener("DOMContentLoaded", function () {
       newRow.innerHTML = `
       <div class="input">
       <input type="text" name="ingredientId[]" placeholder="Ingredient ID" required value="${
-        ingredient.ingredientId
+        index + 1
       }">
       </div>
       <div class="input">
       <input type="text" name="ingredientName[]" placeholder="Ingredient Name" required value="${
-        ingredient.ingredientName
+        ingredient.name
       }">
       </div>
       <div class="input">
           <input type="text" name="ingredientQuantity[]" placeholder="Quantity" required value="${
-            ingredient.ingredientQuantity
+            ingredient.quantity
           }">
           </div>
           <div class="input">
           <select name="ingredientUnit[]" required>
           <option value="grams" ${
-            ingredient.ingredientUnit === "grams" ? "selected" : ""
+            ingredient.units === "grams" ? "selected" : ""
           }>grams</option>
           <option value="cups" ${
-            ingredient.ingredientUnit === "cups" ? "selected" : ""
+            ingredient.units === "cups" ? "selected" : ""
           }>cups</option>
           <option value="ml" ${
-            ingredient.ingredientUnit === "ml" ? "selected" : ""
+            ingredient.units === "ml" ? "selected" : ""
           }>ml</option>
           <option value="teaspoon" ${
-            ingredient.ingredientUnit === "teaspoon" ? "selected" : ""
+            ingredient.units === "teaspoon" ? "selected" : ""
           }>teaspoon</option>
           <option value="tablespoon" ${
-            ingredient.ingredientUnit === "tablespoon" ? "selected" : ""
+            ingredient.units === "tablespoon" ? "selected" : ""
           }>tablespoon</option>
           <option value="pieces" ${
-            ingredient.ingredientUnit === "pieces" ? "selected" : ""
+            ingredient.units === "pieces" ? "selected" : ""
           }>pieces</option>
           </select>
           </div>
@@ -123,16 +140,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Populate method steps
     methodSection.innerHTML = "";
-    recipeToEdit.methodSteps.forEach((step, index) => {
+    recipeToEdit.methods.split("\n").forEach((step, index) => {
       const newStep = document.createElement("div");
       newStep.className = "method-step";
 
       newStep.innerHTML = `
       <div class="method-step-number">${index + 1}</div>
       <div class="method-step-content">
-      <textarea name="methodStep[]" placeholder="Enter step description" required>${
-        step.description
-      }</textarea>
+      <textarea name="methodStep[]" placeholder="Enter step description" required>${step}</textarea>
       </div>
       <button type="button" class="remove-method-btn">
       <i class="fas fa-times"></i>
@@ -153,9 +168,6 @@ document.addEventListener("DOMContentLoaded", function () {
     updateRemoveMethodButtonVisivility();
   }
   // --------------------------------------------
-
-  // Initialize the form
-  populateForm();
 
   // Add Ingredient Functionality
   addIngredientBtn.addEventListener("click", function () {
@@ -371,7 +383,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // --------------------------------------------
 
     // Handle photo - use existing photo if no new one is selected
-    let photoBase64 = recipeToEdit.photo || "";
+    let photoBase64 = recipeToEdit.image || "";
     if (photoInput.files[0]) {
       const reader = new FileReader();
       reader.onload = function (e) {
@@ -387,41 +399,55 @@ document.addEventListener("DOMContentLoaded", function () {
     function updateRecipe(photo) {
       // Create updated recipe object
       const updatedRecipe = {
-        recipeId,
-        recipeName,
-        courseType,
-        recipeDescription,
-        methodSteps,
-        ingredients,
-        photo,
+        name: recipeName,
+        course_type: courseType,
+        description: recipeDescription,
+        methods: methodSteps.map((step) => step.description).join("\n"),
+        ingredients: ingredients.map((ing) => ({
+          name: ing.ingredientName,
+          quantity: ing.ingredientQuantity,
+          units: ing.ingredientUnit,
+        })),
+        image: photo,
       };
 
-      // Find index of the recipe to update
-      const recipeIndex = recipes.findIndex(
-        (recipe) => recipe.recipeId === recipeIdToEdit
-      );
+      // Send updated recipe to backend API
+      fetch(`http://127.0.0.1:8000/api/recipes/${recipeIdToEdit}/`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${
+            document.cookie
+              .split("; ")
+              .find((row) => row.startsWith("access_token="))
+              .split("=")[1]
+          }`,
+        },
+        body: JSON.stringify(updatedRecipe),
+      })
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error("Failed to update recipe");
+          }
+          return response.json();
+        })
+        .then((data) => {
+          // Show success message
+          showToast("Recipe updated successfully!");
 
-      if (recipeIndex !== -1) {
-        // Update the recipe in the array
-        recipes[recipeIndex] = updatedRecipe;
-
-        // Save to localStorage
-        localStorage.setItem("recipes", JSON.stringify(recipes));
-
-        // Show success message
-        showToast("Recipe updated successfully!");
-
-        // Redirect after delay
-        setTimeout(() => {
-          window.location.href = "../HTML/Recipes.html";
-        }, 1500);
-      } else {
-        showToast("Error updating recipe", "error");
-      }
+          // Redirect after delay
+          setTimeout(() => {
+            window.location.href = "../HTML/Recipes.html";
+          }, 1500);
+        })
+        .catch((error) => {
+          console.error("Error updating recipe:", error);
+          showToast("Failed to update recipe. Please try again.", "error");
+        });
     }
   });
   // --------------------------------------------
-  
+
   // Initialize first remove buttons as hidden if only one exists
   updateRemoveIngredientButtonVisivility();
   updateRemoveMethodButtonVisivility();

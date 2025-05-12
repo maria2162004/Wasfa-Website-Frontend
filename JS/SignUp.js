@@ -61,6 +61,7 @@ form.addEventListener("submit", async function (event) {
       password: password_value,
       confirm_password: confirmpassword_value,
       phone: phone_value,
+      is_admin: role_value === "admin", // Add is_admin based on the selected role
     };
 
     try {
@@ -76,8 +77,8 @@ form.addEventListener("submit", async function (event) {
 
       if (response.ok) {
         // Set tokens in cookies (not localStorage)
-        setCookie('access_token', data.tokens.access, 1);  // 1 day expiration
-        setCookie('refresh_token', data.tokens.refresh, 7); // 7 days expiration
+        setCookie("access_token", data.tokens.access, 1); // 1 day expiration
+        setCookie("refresh_token", data.tokens.refresh, 7); // 7 days expiration
 
         showAlert("Sign Up Successfully!");
         form.reset();
@@ -86,15 +87,25 @@ form.addEventListener("submit", async function (event) {
           window.location.href = "../HTML/HomePage.html"; // Redirect after successful sign-up
         }, 2000);
       } else {
-        console.log("Error details from server:", JSON.stringify(data, null, 2));
+        console.log(
+          "Error details from server:",
+          JSON.stringify(data, null, 2)
+        );
 
         if (data.email) showError(inputemail, data.email[0]);
         if (data.name) showError(inputname, data.name[0]);
         if (data.password) showError(inputpassword, data.password[0]);
-        if (data.confirm_password) showError(inputconfirmpassword, data.confirm_password[0]);
+        if (data.confirm_password)
+          showError(inputconfirmpassword, data.confirm_password[0]);
         if (data.phone) showError(inputphone, data.phone[0]);
 
-        if (!data.email && !data.name && !data.password && !data.phone && !data.confirm_password) {
+        if (
+          !data.email &&
+          !data.name &&
+          !data.password &&
+          !data.phone &&
+          !data.confirm_password
+        ) {
           showAlert("Signup failed. Check your info.");
         }
       }
@@ -148,6 +159,6 @@ document.getElementById("closeAlert").addEventListener("click", function () {
 // Function to set a cookie with a specific expiration
 function setCookie(name, value, days) {
   const date = new Date();
-  date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000)); // Days to milliseconds
+  date.setTime(date.getTime() + days * 24 * 60 * 60 * 1000); // Days to milliseconds
   document.cookie = `${name}=${value}; expires=${date.toUTCString()}; path=/`;
 }

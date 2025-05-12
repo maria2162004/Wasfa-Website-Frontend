@@ -24,7 +24,9 @@ document.addEventListener("DOMContentLoaded", () => {
       document.getElementById("recipe-img").src = recipe.image || "";
       document.getElementById("recipe-img").alt = recipe.name;
       document.getElementById("recipe-title").textContent = recipe.name;
-      document.getElementById("recipe-description").textContent = `Description: ${recipe.description}`;
+      document.getElementById(
+        "recipe-description"
+      ).textContent = `Description: ${recipe.description}`;
 
       // Ingredients
       const ingredientList = document.getElementById("recipe-ingredients");
@@ -38,7 +40,9 @@ document.addEventListener("DOMContentLoaded", () => {
       // Methods
       const methodList = document.getElementById("recipe-method");
       methodList.innerHTML = "";
-      const steps = recipe.methods.split(/[\n.]+/).filter((step) => step.trim());
+      const steps = recipe.methods
+        .split(/[\n.]+/)
+        .filter((step) => step.trim());
       steps.forEach((step) => {
         const li = document.createElement("li");
         li.textContent = step.trim();
@@ -94,8 +98,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
       // Admin logic (optional)
       const editBtn = document.getElementById("edit-btn");
-      const isAdmin = false; // Implement your own logic (e.g., from a logged-in user system)
-      if (isAdmin) {
+      const isAdminUser = isAdmin(); // Use centralized function
+
+      if (isAdminUser) {
         editBtn.style.display = "flex";
         favoriteBtn.style.display = "none";
         editBtn.addEventListener("click", () => {

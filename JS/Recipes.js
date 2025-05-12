@@ -11,7 +11,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   const buttons = document.querySelectorAll(".category-button");
   buttons.forEach((button) => {
     button.addEventListener("click", () => {
-      document.querySelector(".category-button.active")?.classList.remove("active");
+      document
+        .querySelector(".category-button.active")
+        ?.classList.remove("active");
       button.classList.add("active");
 
       currentCategory = button.getAttribute("data-category");
@@ -54,7 +56,8 @@ function renderRecipes() {
 
   if (currentCategory !== "all") {
     filteredRecipes = filteredRecipes.filter(
-      (recipe) => recipe.category.toLowerCase() === currentCategory.toLowerCase()
+      (recipe) =>
+        recipe.category.toLowerCase() === currentCategory.toLowerCase()
     );
   }
 
@@ -92,25 +95,28 @@ function renderRecipes() {
     });
 
     // Show Delete button if user is admin
-    const currentUser = JSON.parse(sessionStorage.getItem("user")); // Use sessionStorage if needed
-    const isAdmin = currentUser && currentUser.isAdmin;
-    if (isAdmin) {
+    const isAdminUser = isAdmin(); // Use centralized function
+
+    if (isAdminUser) {
       const removeBtn = document.createElement("button");
       removeBtn.textContent = "Delete";
       removeBtn.classList.add("remove-btn");
 
       removeBtn.addEventListener("click", (e) => {
         e.stopPropagation(); // Prevent click on card
-        showCustomConfirm("Are you sure you want to delete this recipe?", async () => {
-          const success = await deleteRecipe(recipe.id);
-          if (success) {
-            recipes = recipes.filter((r) => r.id !== recipe.id);
-            renderRecipes();
-            showCustomAlert("Recipe deleted successfully");
-          } else {
-            showCustomAlert("Failed to delete recipe", "error");
+        showCustomConfirm(
+          "Are you sure you want to delete this recipe?",
+          async () => {
+            const success = await deleteRecipe(recipe.id);
+            if (success) {
+              showCustomAlert("Recipe deleted successfully.", "success");
+              recipes = recipes.filter((r) => r.id !== recipe.id);
+              renderRecipes();
+            } else {
+              showCustomAlert("Failed to delete recipe.", "error");
+            }
           }
-        });
+        );
       });
 
       card.appendChild(removeBtn);
@@ -121,9 +127,18 @@ function renderRecipes() {
 // Delete recipe from API
 async function deleteRecipe(id) {
   try {
+    const accessToken = document.cookie
+      .split("; ")
+      .find((row) => row.startsWith("access_token="))
+      .split("=")[1];
+
     const res = await fetch(`${API_URL}${id}/`, {
       method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
     });
+
     return res.ok;
   } catch (err) {
     console.error("Error deleting recipe:", err);
@@ -176,4 +191,14 @@ function showCustomConfirm(message, confirmCallback) {
   confirmBox.querySelector(".confirm-no").addEventListener("click", () => {
     overlay.remove();
   });
+}
+
+// Centralized function to check if user is admin
+function isAdmin() {
+  const accessToken = document.cookie
+    .split("; ")
+    .find((row) => row.startsWith("access_token="))
+    .split("=")[1];
+  const payload = JSON.parse(atob(accessToken.split(".")[1]));
+  return payload.is_admin; // Extract is_admin from token payload
 }

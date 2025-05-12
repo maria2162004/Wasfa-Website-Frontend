@@ -282,32 +282,55 @@ document.addEventListener("DOMContentLoaded", function () {
     function saveRecipe(photo) {
       // Create new recipe object
       const newRecipe = {
-        recipeId,
-        recipeName,
-        courseType,
-        recipeDescription,
-        methodSteps,
-        ingredients,
-        photo,
+        name: recipeName,
+        course_type: courseType,
+        description: recipeDescription,
+        methods: methodSteps.map((step) => step.description).join("\n"),
+        ingredients: ingredients.map((ing) => ({
+          name: ing.ingredientName,
+          quantity: ing.ingredientQuantity,
+          units: ing.ingredientUnit,
+        })),
+        image: photo,
       };
 
-      // Add to recipes array
-      recipes.push(newRecipe);
+      // Send recipe to backend API
+      fetch("http://127.0.0.1:8000/api/recipes/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${
+            document.cookie
+              .split("; ")
+              .find((row) => row.startsWith("access_token="))
+              .split("=")[1]
+          }`,
+        },
+        body: JSON.stringify(newRecipe),
+      })
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error("Failed to save recipe");
+          }
+          return response.json();
+        })
+        .then((data) => {
+          // Show success message
+          showToast("Recipe saved successfully!");
 
-      // Save to localStorage
-      localStorage.setItem("recipes", JSON.stringify(recipes));
+          // Redirect after delay
+          setTimeout(() => {
+            window.location.href = "../HTML/Recipes.html";
+          }, 1000);
 
-      // Show success message
-      showToast("Recipe saved successfully!");
-
-      // Redirect after delay
-      setTimeout(() => {
-        window.location.href = "../HTML/Recipes.html";
-      }, 1000);
-
-      // Reset form
-      form.reset();
-      resetAll();
+          // Reset form
+          form.reset();
+          resetAll();
+        })
+        .catch((error) => {
+          console.error("Error saving recipe:", error);
+          showToast("Failed to save recipe. Please try again.", "error");
+        });
     }
   });
   // --------------------------------------------
