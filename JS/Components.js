@@ -220,12 +220,11 @@ class NavBar extends HTMLElement {
 
     if (accessToken && refreshToken) {
       // Decode token to get user info
-      const payload = decodeToken(accessToken);
-      const user = { isAdmin: payload.is_admin };
+      const isAdmin = this.getCookie("is_admin") === "true";
 
       authButtons.innerHTML = `
             ${
-              !user.isAdmin
+              !isAdmin
                 ? `
             <a href="../HTML/FavoriteRecipes.html">
                 <button type="button" style="background: none; border: none; cursor: pointer;">
@@ -236,7 +235,7 @@ class NavBar extends HTMLElement {
                 : ""
             }
             ${
-              user.isAdmin
+              isAdmin
                 ? `
             <a href="../HTML/AddRecipe.html">
                 <button type="button" style="background: none; border: none; cursor: pointer;">
@@ -252,7 +251,8 @@ class NavBar extends HTMLElement {
       const logoutBtn = document.getElementById("logoutBtn");
       logoutBtn.addEventListener("click", () => {
         this.deleteCookie("access_token");
-        this.deleteCookie("refresh_token");
+      this.deleteCookie("refresh_token");
+        this.deleteCookie("is_admin");
         location.reload();
       });
     } else {

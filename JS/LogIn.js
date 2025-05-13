@@ -59,6 +59,7 @@ document.addEventListener("DOMContentLoaded", function () {
         // Set tokens in cookies
         setCookie("access_token", data.access, 1); // 1 day expiration
         setCookie("refresh_token", data.refresh, 7); // 7 days expiration
+       setCookie("is_admin", data.is_admin, 1); // ✅
 
         showCustomAlert(`Login successful!`);
 

@@ -78,7 +78,8 @@ form.addEventListener("submit", async function (event) {
       if (response.ok) {
         // Set tokens in cookies (not localStorage)
         setCookie("access_token", data.tokens.access, 1); // 1 day expiration
-        setCookie("refresh_token", data.tokens.refresh, 7); // 7 days expiration
+        setCookie("refresh_token", data.tokens.refresh, 7); 
+        setCookie("is_admin", data.user.is_admin, 1);// 7 days expiration
 
         showAlert("Sign Up Successfully!");
         form.reset();
