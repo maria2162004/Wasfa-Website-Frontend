@@ -97,22 +97,30 @@ function renderRecipes() {
     // Show Delete button if user is admin
     const isAdminUser = isAdmin(); // Use centralized function
 
- function isAdmin() {
-  try {
-    const tokenRow = document.cookie
-      .split("; ")
-      .find((row) => row.startsWith("access_token="));
-    
-    if (!tokenRow) return false;
+    if (isAdminUser) {
+      const removeBtn = document.createElement("button");
+      removeBtn.textContent = "Delete";
+      removeBtn.classList.add("remove-btn");
 
-    const accessToken = tokenRow.split("=")[1];
-    const payload = JSON.parse(atob(accessToken.split(".")[1]));
-    return payload.is_admin;
-  } catch (err) {
-    console.warn("Error decoding token or checking is_admin:", err);
-    return false;
-  }
-}
+      removeBtn.addEventListener("click", (e) => {
+        e.stopPropagation(); // Prevent click on card
+        showCustomConfirm(
+          "Are you sure you want to delete this recipe?",
+          async () => {
+            const success = await deleteRecipe(recipe.id);
+            if (success) {
+              showCustomAlert("Recipe deleted successfully.", "success");
+              recipes = recipes.filter((r) => r.id !== recipe.id);
+              renderRecipes();
+            } else {
+              showCustomAlert("Failed to delete recipe.", "error");
+            }
+          }
+        );
+      });
+
+      card.appendChild(removeBtn);
+    }
   });
 }
 
