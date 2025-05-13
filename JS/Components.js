@@ -175,7 +175,7 @@ class NavBar extends HTMLElement {
       
       <nav>
         <a href="../HTML/HomePage.html">
-          <img src="../Images/WasfaLogo.svg" alt="Website Logo" />
+          <img src="../Images/WasfaLogo.png" alt="Website Logo" />
         </a>
 
         <div class="search-container">
