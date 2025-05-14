@@ -75,14 +75,14 @@ function renderRecipes() {
     const image = document.createElement("img");
     image.src = recipe.image;
     image.alt = recipe.name;
-    image.onerror = function () {
-       // Avoid infinite loop by ensuring the image fails only once and uses a fallback
-      if (this.src !== "../Images/default-recipe.jpg") {
-        this.src = "../Images/default-recipe.jpg";  // Use correct fallback image path
-      } else {
-        this.src = "../Images/placeholder.jpg";  // Optionally provide a placeholder image if default-recipe.jpg is missing
-      }
-    };
+    // image.onerror = function () {
+    //    // Avoid infinite loop by ensuring the image fails only once and uses a fallback
+    //   if (this.src !== "../Images/default-recipe.jpg") {
+    //     this.src = "../Images/default-recipe.jpg";  // Use correct fallback image path
+    //   } else {
+    //     this.src = "../Images/placeholder.jpg";  // Optionally provide a placeholder image if default-recipe.jpg is missing
+    //   }
+    // };
 
     const title = document.createElement("h3");
     title.textContent = recipe.name;
@@ -168,7 +168,7 @@ async function deleteRecipe(id) {
       return false;
     }
 
-    const res = await fetch(`${API_URL}delete/${id}/`, {
+    const res = await fetch(`${API_URL}${id}/`, {
       method: "DELETE",
       headers: {
         Authorization: `Bearer ${accessToken}`,
