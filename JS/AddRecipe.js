@@ -16,6 +16,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
     newRow.innerHTML = `
       <div class="input">
+        <input type="text" name="ingredientId[]" placeholder="Ingredient ID" required>
+      </div>
+      <div class="input">
         <input type="text" name="ingredientName[]" placeholder="Ingredient Name" required>
       </div>
       <div class="input">
@@ -92,6 +95,62 @@ document.addEventListener("DOMContentLoaded", function () {
     photoPreview.style.display = url ? "block" : "none";
   });
 
+  function getAccessToken() {
+    const token = document.cookie
+      .split("; ")
+      .find((row) => row.startsWith("access_token="))
+      ?.split("=")[1];
+    return token;
+  }
+
+  function handleAddRecipe(newRecipe) {
+    const accessToken = getAccessToken();
+
+    if (!accessToken) {
+      console.log("No access token found. Please log in.");
+      showToast("Session expired. Please log in again.", "error");
+      return;
+    }
+
+    // Make the POST request to add the recipe
+    fetch("http://127.0.0.1:8000/api/recipes/add/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
+      },
+      body: JSON.stringify(newRecipe),
+    })
+      .then((response) => {
+        if (!response.ok) {
+          // Check if the response indicates token expiry
+          if (response.status === 401) {
+            showToast("Session expired. Please log in again.", "error");
+            window.location.href = "../HTML/login.html";  // Redirect to login page if token is expired
+            return;
+          }
+          return response.json().then((err) => {
+            throw new Error(JSON.stringify(err));
+          });
+        }
+        return response.json();
+      })
+      .then(() => {
+        showToast("Recipe added successfully!");
+        setTimeout(() => {
+          window.location.href = "../HTML/Recipes.html"; // Redirect after successful addition
+        }, 1000);
+        form.reset();
+        photoPreview.src = "";
+        photoPreview.style.display = "none";
+      })
+      .catch((error) => {
+        console.error("Failed to add recipe:", error);
+        showToast("Failed to add recipe. Please check inputs.", "error");
+      });
+  }
+
+  // Form submission
   form.addEventListener("submit", function (e) {
     e.preventDefault();
 
@@ -104,10 +163,12 @@ document.addEventListener("DOMContentLoaded", function () {
     const ingredients = [];
     const ingredientRows = ingredientSection.querySelectorAll(".ingredient-row");
     ingredientRows.forEach((row) => {
+      const id = row.querySelector('[name="ingredientId[]"]').value.trim();
       const name = row.querySelector('[name="ingredientName[]"]').value.trim();
       const quantity = parseFloat(row.querySelector('[name="ingredientQuantity[]"]').value);
       const unit = row.querySelector('[name="ingredientUnit[]"]').value;
-      ingredients.push({ name, quantity, units: unit });
+      ingredients.push({ id, name, quantity, units: unit });
+      console.log("Ingredients:", ingredients);
     });
 
     // Method steps
@@ -124,39 +185,6 @@ document.addEventListener("DOMContentLoaded", function () {
       image: imageUrl,
     };
 
-    fetch("http://127.0.0.1:8000/api/recipes/add/", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${
-          document.cookie
-            .split("; ")
-            .find((row) => row.startsWith("access_token="))
-            ?.split("=")[1] || ""
-        }`,
-      },
-      body: JSON.stringify(newRecipe),
-    })
-      .then((response) => {
-        if (!response.ok) {
-          return response.json().then((err) => {
-            throw new Error(JSON.stringify(err));
-          });
-        }
-        return response.json();
-      })
-      .then(() => {
-        showToast("Recipe added successfully!");
-        setTimeout(() => {
-          window.location.href = "../HTML/Recipes.html";
-        }, 1000);
-        form.reset();
-        photoPreview.src = "";
-        photoPreview.style.display = "none";
-      })
-      .catch((error) => {
-        console.error("Failed to add recipe:", error);
-        showToast("Failed to add recipe. Please check inputs.", "error");
-      });
+    handleAddRecipe(newRecipe);  // Call function to handle the API request
   });
 });

@@ -3,8 +3,8 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Edit existing recipes in Wasfa" />
-    <title>Edit Recipe | Wasfa</title>
+    <meta name="description" content="Add new recipes to Wasfa" />
+    <title>Add Recipe | Wasfa</title>
     <!-- Font Awesome -->
     <link
       rel="stylesheet"
@@ -39,9 +39,9 @@
     <main class="add-recipe-page">
       <!-- header -->
       <header class="page-header">
-        <h1 class="page-title">Edit Recipe</h1>
+        <h1 class="page-title">Add New Recipe</h1>
         <p class="page-subtitle">
-          Update your delicious recipe in the Wasfa community
+          Share your delicious creations with the Wasfa community
         </p>
       </header>
 
@@ -50,42 +50,28 @@
           <h2 class="form-title">Recipe Information</h2>
 
           <!-- Recipe Photo -->
-          <div class="form-group">
-            <label for="recipePhoto">Recipe Photo</label>
-            <div class="photo-upload-container">
-              <div class="photo-preview-container" id="photoPreviewContainer">
-                <img
-                  id="photoPreview"
-                  class="photo-preview"
-                  src=""
-                  alt="Recipe preview"
-                />
-                <span class="photo-placeholder">
-                  <i class="fas fa-camera"></i>
-                  <span>No photo selected</span>
-                </span>
-                <button
-                  type="button"
-                  class="remove-photo-btn"
-                  id="removePhotoBtn"
-                >
-                  <i class="fas fa-times"></i>
-                </button>
-              </div>
+           <div class="form-group">
+            <label for="imageUrl">Recipe Photo URL*</label>
+            <div class="input">
               <input
-                type="file"
-                id="recipePhoto"
-                name="recipePhoto"
-                accept="image/*"
-                class="photo-input"
+                type="url"
+                id="imageUrl"
+                name="imageUrl"
+                required
+                placeholder="e.g., https://example.com/image.jpg"
               />
-              <label for="recipePhoto" class="photo-upload-btn">
-                <i class="fas fa-cloud-upload-alt"></i> Choose Photo
-              </label>
+            </div>
+
+            <!-- Preview Container -->
+            <div class="photo-preview-container">
+              <img id="photoPreview" class="photo-preview" src="" alt="Image Preview" />
+              <div class="photo-placeholder" id="photoPlaceholder">
+                <i class="fas fa-image"></i>
+                <p>Image preview will appear here</p>
+              </div>
             </div>
           </div>
-
-          <!-- Recipe Id -->
+                    <!-- Recipe Id -->
           <div class="form-group">
             <label for="recipeId">Recipe ID*</label>
             <div class="input">
@@ -95,7 +81,6 @@
                 name="recipeId"
                 required
                 placeholder="Enter unique recipe identifier"
-                readonly
               />
             </div>
           </div>
@@ -142,7 +127,26 @@
           <div class="form-group">
             <label>Method Steps*</label>
             <div class="method-section" id="methodSection">
-              <!-- Method steps will be populated by JavaScript -->
+              <!-- Method Step -->
+              <div class="method-step">
+                <div class="method-step-number">1</div>
+                <div class="method-step-content">
+                  <textarea
+                    name="methodStep[]"
+                    placeholder="Enter step description"
+                    required
+                  ></textarea>
+                </div>
+
+                <!-- Remove Step Button -->
+                <button
+                  type="button"
+                  class="remove-method-btn"
+                  style="display: none"
+                >
+                  <i class="fas fa-times"></i>
+                </button>
+              </div>
             </div>
 
             <!-- Add Step Button -->
@@ -155,7 +159,58 @@
           <div class="form-group">
             <label>Ingredients*</label>
             <div class="ingredient-section" id="ingredientSection">
-              <!-- Ingredients will be populated by JavaScript -->
+              <div class="ingredient-row">
+                <!-- Ingredient Id -->
+                <div class="input">
+                  <input
+                    type="text"
+                    name="ingredientId[]"
+                    placeholder="Ingredient ID"
+                    required
+                  />
+                </div>
+
+                <!-- Ingredient Name -->
+                <div class="input">
+                  <input
+                    type="text"
+                    name="ingredientName[]"
+                    placeholder="Ingredient Name"
+                    required
+                  />
+                </div>
+
+                <!-- Ingredient Quantity -->
+                <div class="input">
+                  <input
+                    type="text"
+                    name="ingredientQuantity[]"
+                    placeholder="Quantity"
+                    required
+                  />
+                </div>
+
+                <!-- Unit Selection -->
+                <div class="input">
+                  <select name="ingredientUnit[]" required>
+                    <option value="grams">grams</option>
+                    <option value="cups">cups</option>
+                    <option value="ml">ml</option>
+                    <option value="teaspoon">teaspoon</option>
+                    <option value="tablespoon">tablespoon</option>
+                    <option value="pieces">pieces</option>
+                  </select>
+                </div>
+
+                <!-- Remove button for the first row (hidden) -->
+                <button
+                  type="button"
+                  class="remove-ingredient-btn"
+                  style="display: none"
+                >
+                  <i class="fas fa-times"></i>
+                </button>
+              </div>
             </div>
 
             <!-- Add Ingredient Button -->
@@ -171,15 +226,13 @@
           <!-- Submit & Reset Buttons -->
           <div class="btn-group">
             <button id="submit_button" type="submit" class="btn">
-              Update Recipe
+              Save Recipe
             </button>
-            <button type="button" id="cancelBtn" class="btn btn-secondary">
-              Cancel
-            </button>
+            <button type="reset" class="btn btn-secondary">Reset Form</button>
           </div>
         </form>
       </div>
     </main>
-    <script src="../JS/EditRecipe.js"></script>
+    <script src="../JS/AddRecipe.js"></script>
   </body>
 </html>
