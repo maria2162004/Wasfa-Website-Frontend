@@ -97,16 +97,20 @@ document.addEventListener("DOMContentLoaded", () => {
       });
 
       // Admin logic (optional)
-      const editBtn = document.getElementById("edit-btn");
-      const isAdminUser = isAdmin(); // Use centralized function
+       const editBtn = document.getElementById("edit-btn");
+      const isAdminUser = isAdmin(); // Check if the current user is an admin
 
       if (isAdminUser) {
+        // Show Edit Recipe button and hide the Favorites button
         editBtn.style.display = "flex";
         favoriteBtn.style.display = "none";
+
+        // Redirect to the Edit Recipe page when the Edit button is clicked
         editBtn.addEventListener("click", () => {
           window.location.href = `../HTML/EditRecipe.html?id=${id}`;
         });
       } else {
+        // Normal user: show the Favorites button and hide the Edit button
         editBtn.style.display = "none";
         favoriteBtn.style.display = "flex";
       }
