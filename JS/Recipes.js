@@ -2,8 +2,11 @@ const API_URL = "http://127.0.0.1:8000/api/recipes/";
 let recipes = [];
 let currentCategory = "all";
 let currentSearchTerm = "";
+let isAdminUser = false;
 
 document.addEventListener("DOMContentLoaded", async () => {
+  isAdminUser = await checkIfAdmin();
+
   recipes = await loadRecipes();
   renderRecipes();
 
@@ -11,9 +14,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const buttons = document.querySelectorAll(".category-button");
   buttons.forEach((button) => {
     button.addEventListener("click", () => {
-      document
-        .querySelector(".category-button.active")
-        ?.classList.remove("active");
+      document.querySelector(".category-button.active")?.classList.remove("active");
       button.classList.add("active");
 
       currentCategory = button.getAttribute("data-category");
@@ -75,7 +76,12 @@ function renderRecipes() {
     image.src = recipe.image;
     image.alt = recipe.name;
     image.onerror = function () {
-      this.src = "../Images/default-recipe.jpg";
+       // Avoid infinite loop by ensuring the image fails only once and uses a fallback
+      if (this.src !== "../Images/default-recipe.jpg") {
+        this.src = "../Images/default-recipe.jpg";  // Use correct fallback image path
+      } else {
+        this.src = "../Images/placeholder.jpg";  // Optionally provide a placeholder image if default-recipe.jpg is missing
+      }
     };
 
     const title = document.createElement("h3");
@@ -95,8 +101,6 @@ function renderRecipes() {
     });
 
     // Show Delete button if user is admin
-    const isAdminUser = isAdmin(); // Use centralized function
-
     if (isAdminUser) {
       const removeBtn = document.createElement("button");
       removeBtn.textContent = "Delete";
@@ -104,19 +108,16 @@ function renderRecipes() {
 
       removeBtn.addEventListener("click", (e) => {
         e.stopPropagation(); // Prevent click on card
-        showCustomConfirm(
-          "Are you sure you want to delete this recipe?",
-          async () => {
-            const success = await deleteRecipe(recipe.id);
-            if (success) {
-              showCustomAlert("Recipe deleted successfully.", "success");
-              recipes = recipes.filter((r) => r.id !== recipe.id);
-              renderRecipes();
-            } else {
-              showCustomAlert("Failed to delete recipe.", "error");
-            }
+        showCustomConfirm("Are you sure you want to delete this recipe?", async () => {
+          const success = await deleteRecipe(recipe.id);
+          if (success) {
+            showCustomAlert("Recipe deleted successfully.", "success");
+            recipes = recipes.filter((r) => r.id !== recipe.id);
+            renderRecipes();
+          } else {
+            showCustomAlert("Failed to delete recipe.", "error");
           }
-        );
+        });
       });
 
       card.appendChild(removeBtn);
@@ -126,22 +127,74 @@ function renderRecipes() {
 
 // Delete recipe from API
 async function deleteRecipe(id) {
+  // try {
+  //   const accessToken = document.cookie
+  //     .split("; ")
+  //     .find((row) => row.startsWith("access_token="))
+  //     ?.split("=")[1];
+
+  //   if (!accessToken) {
+  //     showCustomAlert("Unauthorized. Please log in.", "error");
+  //     return false;
+  //   }
+
+  //   const res = await fetch(`${API_URL}delete/${id}/`, {
+  //     method: "DELETE",
+  //     headers: {
+  //       Authorization: `Bearer ${accessToken}`,
+  //     },
+  //   });
+
+  //   if (!res.ok) {
+  //     const error = await res.json();
+  //     console.error("Delete failed:", error);
+  //     return false;
+  //   }
+
+  //   return true;
+  // } catch (err) {
+  //   console.error("Error deleting recipe:", err);
+  //   return false;
+  // }
+
   try {
     const accessToken = document.cookie
       .split("; ")
       .find((row) => row.startsWith("access_token="))
-      .split("=")[1];
+      ?.split("=")[1];
 
-    const res = await fetch(`${API_URL}${id}/`, {
+    if (!accessToken) {
+      showCustomAlert("Unauthorized. Please log in.", "error");
+      return false;
+    }
+
+    const res = await fetch(`${API_URL}delete/${id}/`, {
       method: "DELETE",
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
     });
 
-    return res.ok;
+    // Handle non-OK responses (unauthorized, etc.)
+    if (!res.ok) {
+      const error = await res.json();
+      console.error("Delete failed:", error);
+      showCustomAlert("Failed to delete recipe.", "error");
+      return false;
+    }
+
+    // If the response was successful, return true
+    if (res.status === 204) {
+      // Recipe was successfully deleted
+      return true;
+    }
+
+    // Catch any unexpected errors
+    console.error("Unexpected error during deletion", res);
+    return false;
   } catch (err) {
     console.error("Error deleting recipe:", err);
+    showCustomAlert("An unexpected error occurred while deleting the recipe.", "error");
     return false;
   }
 }
@@ -193,116 +246,28 @@ function showCustomConfirm(message, confirmCallback) {
   });
 }
 
-// Utility function to get JWT token from cookies
-function getAuthToken() {
-  const cookie = document.cookie
-    .split('; ')
-    .find(row => row.startsWith('access_token='));
-  return cookie ? cookie.split('=')[1] : null;
-}
+// Check admin status from backend securely
+async function checkIfAdmin() {
+  const accessToken = document.cookie
+    .split("; ")
+    .find((row) => row.startsWith("access_token="))
+    ?.split("=")[1];
 
-// Modified isAdmin function with multiple verification options
-function isAdmin() {
+  if (!accessToken) return false;
+
   try {
-    const token = getAuthToken();
-    if (!token) {
-      console.warn("No authentication token found");
-      return false;
-    }
-
-    // Decode the JWT payload
-    const payload = JSON.parse(atob(token.split('.')[1]));
-    console.log("Decoded JWT payload:", payload);
-
-    // OPTION 1: Check for admin user IDs (quick solution)
-    const ADMIN_USER_IDS = [19]; // Add all admin user IDs here
-    if (ADMIN_USER_IDS.includes(payload.user_id)) {
-      console.log(`User ${payload.user_id} is admin (via ID check)`);
-      return true;
-    }
-
-    // OPTION 2: Make API call to verify admin status (more secure)
-    // Uncomment this if you implement an admin-check endpoint
-    /*
-    const adminCheck = await verifyAdminStatus(payload.user_id);
-    if (adminCheck) {
-      return true;
-    }
-    */
-
-    // OPTION 3: Check for admin role in payload (best practice)
-    // If your backend adds this later
-    if (payload.role === 'admin' || payload.is_admin) {
-      return true;
-    }
-
-    console.log("User is not admin");
-    return false;
-  } catch (error) {
-    console.error("Admin check failed:", error);
-    return false;
-  }
-}
-
-// API verification function (for Option 2)
-async function verifyAdminStatus(userId) {
-  try {
-    const response = await fetch(`/api/users/${userId}/admin-status`, {
+    const res = await fetch("http://127.0.0.1:8000/api/auth/is-admin/", {  // Updated URL here
       headers: {
-        'Authorization': `Bearer ${getAuthToken()}`
-      }
+        Authorization: `Bearer ${accessToken}`,
+      },
     });
-    return response.ok && (await response.json()).is_admin;
+
+    if (!res.ok) return false;
+
+    const data = await res.json();
+    return data.is_admin || false;
   } catch (error) {
-    console.error("Admin verification failed:", error);
+    console.error("Failed to verify admin status:", error);
     return false;
   }
-}
-
-// Modified renderRecipes function with debug checks
-function renderRecipes() {
-  const container = document.querySelector(".recipe-cards-container");
-  if (!container) {
-    console.error("Recipe container not found!");
-    return;
-  }
-  container.innerHTML = "";
-
-  // Debug: Check admin status before rendering
-  console.group("Admin Status Check");
-  const adminStatus = isAdmin();
-  console.log("Current user is admin:", adminStatus);
-  console.groupEnd();
-
-  recipes.forEach(recipe => {
-    const card = document.createElement("div");
-    card.className = "recipe-card";
-    
-    // Recipe content
-    card.innerHTML = `
-      <img src="${recipe.image}" alt="${recipe.name}" 
-           onerror="this.src='../Images/default-recipe.jpg'">
-      <h3>${recipe.name}</h3>
-      <p>${recipe.description}</p>
-    `;
-
-    // Admin delete button
-    if (adminStatus) {
-      console.log(`Adding delete button for recipe ${recipe.id}`);
-      const deleteBtn = document.createElement("button");
-      deleteBtn.className = "admin-delete-btn visible";
-      deleteBtn.textContent = "Delete";
-      deleteBtn.onclick = async (e) => {
-        e.stopPropagation();
-        if (confirm("Delete this recipe permanently?")) {
-          await deleteRecipe(recipe.id);
-          recipes = recipes.filter(r => r.id !== recipe.id);
-          renderRecipes();
-        }
-      };
-      card.appendChild(deleteBtn);
-    }
-
-    container.appendChild(card);
-  });
 }
