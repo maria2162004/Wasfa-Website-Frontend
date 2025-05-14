@@ -104,10 +104,12 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
 
       // Back button
-      const backBtn = document.getElementById("back-btn");
-      if (backBtn) {
-        backBtn.addEventListener("click", () => window.history.back());
-      }
+     const backBtn = document.getElementById("back-btn");
+if (backBtn) {
+  backBtn.addEventListener("click", () => {
+    window.location.href = "../HTML/Recipes.html";
+  });
+}
     })
     .catch((error) => {
       alert("Recipe not found. Redirecting...");
