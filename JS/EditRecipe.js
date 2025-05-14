@@ -124,7 +124,7 @@ document.addEventListener("DOMContentLoaded", function () {
       image: imageUrl,
     };
 
-    fetch("http://127.0.0.1:8000/api/recipes/add/", {
+    fetch("http://127.0.0.1:8000/api/recipes/${id}/", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -145,10 +145,10 @@ document.addEventListener("DOMContentLoaded", function () {
         }
         return response.json();
       })
-      .then(() => {
+      .then((createdRecipe) => {
         showToast("Recipe added successfully!");
         setTimeout(() => {
-          window.location.href = "../HTML/Recipes.html";
+          window.location.href = `../HTML/RecipeDetails.html?id=${createdRecipe.id}`;
         }, 1000);
         form.reset();
         photoPreview.src = "";

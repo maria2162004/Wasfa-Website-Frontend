@@ -1,5 +1,4 @@
-document.addEventListener("DOMContentLoaded", () => {
-  // Extract the recipe ID from the URL query parameters
+document.addEventListener("DOMContentLoaded", async () => {
   const urlParams = new URLSearchParams(window.location.search);
   const id = urlParams.get("id");
 
@@ -11,7 +10,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const API_URL = `http://127.0.0.1:8000/api/recipes/${id}/`;
 
-  // Fetch the recipe from the backend
+  // Check if current user is admin
+  const isAdminUser = await checkIfAdmin();
+
   fetch(API_URL)
     .then((response) => {
       if (!response.ok) {
@@ -49,70 +50,57 @@ document.addEventListener("DOMContentLoaded", () => {
         methodList.appendChild(li);
       });
 
-      // Favorite button logic
+      // Buttons
       const favoriteBtn = document.getElementById("favorite-btn");
-      if (!favoriteBtn) {
-        console.error("Favorite button not found!");
-        return; // Exit if the button isn't found
-      }
-
-      console.log("Favorite button exists, setting up click handler...");
-
-      if (recipe.isFav) {
-        favoriteBtn.innerHTML = '<i class="fas fa-heart"></i>';
-        favoriteBtn.classList.add("favorited");
-      } else {
-        favoriteBtn.innerHTML = '<i class="far fa-heart"></i>';
-        favoriteBtn.classList.remove("favorited");
-      }
-
-      // Toggle favorite on click
-      favoriteBtn.addEventListener("click", () => {
-        console.log("Favorite button clicked");
-        const newFavStatus = !recipe.isFav; // Toggle favorite status
-
-        fetch(API_URL, {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ isFav: newFavStatus }), // Send the updated favorite status
-        })
-          .then((response) => response.json())
-          .then((updatedRecipe) => {
-            // Update the UI after successful toggle
-            recipe.isFav = updatedRecipe.isFav; // Update the local recipe object
-            if (recipe.isFav) {
-              favoriteBtn.innerHTML = '<i class="fas fa-heart"></i>';
-              favoriteBtn.classList.add("favorited");
-            } else {
-              favoriteBtn.innerHTML = '<i class="far fa-heart"></i>';
-              favoriteBtn.classList.remove("favorited");
-            }
-          })
-          .catch((error) => {
-            console.error("Error updating favourite status:", error);
-            alert("There was an error updating your favourite status.");
-          });
-      });
-
-      // Admin logic (optional)
-       const editBtn = document.getElementById("edit-btn");
-      const isAdminUser = isAdmin(); // Check if the current user is an admin
+      const editBtn = document.getElementById("edit-btn");
 
       if (isAdminUser) {
-        // Show Edit Recipe button and hide the Favorites button
+        // Admin: Show edit, hide favorite
         editBtn.style.display = "flex";
         favoriteBtn.style.display = "none";
 
-        // Redirect to the Edit Recipe page when the Edit button is clicked
         editBtn.addEventListener("click", () => {
           window.location.href = `../HTML/EditRecipe.html?id=${id}`;
         });
       } else {
-        // Normal user: show the Favorites button and hide the Edit button
+        // User: Show favorite, hide edit
         editBtn.style.display = "none";
         favoriteBtn.style.display = "flex";
+
+        if (recipe.isFav) {
+          favoriteBtn.innerHTML = '<i class="fas fa-heart"></i>';
+          favoriteBtn.classList.add("favorited");
+        } else {
+          favoriteBtn.innerHTML = '<i class="far fa-heart"></i>';
+          favoriteBtn.classList.remove("favorited");
+        }
+
+        favoriteBtn.addEventListener("click", () => {
+          const newFavStatus = !recipe.isFav;
+
+          fetch(API_URL, {
+            method: "PATCH",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ isFav: newFavStatus }),
+          })
+            .then((res) => res.json())
+            .then((updatedRecipe) => {
+              recipe.isFav = updatedRecipe.isFav;
+              if (recipe.isFav) {
+                favoriteBtn.innerHTML = '<i class="fas fa-heart"></i>';
+                favoriteBtn.classList.add("favorited");
+              } else {
+                favoriteBtn.innerHTML = '<i class="far fa-heart"></i>';
+                favoriteBtn.classList.remove("favorited");
+              }
+            })
+            .catch((error) => {
+              console.error("Error updating favourite status:", error);
+              alert("There was an error updating your favourite status.");
+            });
+        });
       }
 
       // Back button
@@ -126,3 +114,29 @@ document.addEventListener("DOMContentLoaded", () => {
       window.location.href = "../HTML/Recipes.html";
     });
 });
+
+// Securely check admin status from backend
+async function checkIfAdmin() {
+  const accessToken = document.cookie
+    .split("; ")
+    .find((row) => row.startsWith("access_token="))
+    ?.split("=")[1];
+
+  if (!accessToken) return false;
+
+  try {
+    const res = await fetch("http://127.0.0.1:8000/api/auth/is-admin/", {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+
+    if (!res.ok) return false;
+
+    const data = await res.json();
+    return data.is_admin || false;
+  } catch (error) {
+    console.error("Failed to verify admin status:", error);
+    return false;
+  }
+}
