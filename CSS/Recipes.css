@@ -200,6 +200,19 @@
   color: #eeeeee;
 }
 
+.admin-delete-btn.visible {
+  display: inline-block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  background: #dc3545;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-top: 8px;
+}
+
 /* Animations */
 @keyframes slideIn {
   from {

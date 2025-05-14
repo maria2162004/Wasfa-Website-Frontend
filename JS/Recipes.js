@@ -193,12 +193,116 @@ function showCustomConfirm(message, confirmCallback) {
   });
 }
 
-// Centralized function to check if user is admin
+// Utility function to get JWT token from cookies
+function getAuthToken() {
+  const cookie = document.cookie
+    .split('; ')
+    .find(row => row.startsWith('access_token='));
+  return cookie ? cookie.split('=')[1] : null;
+}
+
+// Modified isAdmin function with multiple verification options
 function isAdmin() {
-  const accessToken = document.cookie
-    .split("; ")
-    .find((row) => row.startsWith("access_token="))
-    .split("=")[1];
-  const payload = JSON.parse(atob(accessToken.split(".")[1]));
-  return payload.is_admin; // Extract is_admin from token payload
+  try {
+    const token = getAuthToken();
+    if (!token) {
+      console.warn("No authentication token found");
+      return false;
+    }
+
+    // Decode the JWT payload
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    console.log("Decoded JWT payload:", payload);
+
+    // OPTION 1: Check for admin user IDs (quick solution)
+    const ADMIN_USER_IDS = [19]; // Add all admin user IDs here
+    if (ADMIN_USER_IDS.includes(payload.user_id)) {
+      console.log(`User ${payload.user_id} is admin (via ID check)`);
+      return true;
+    }
+
+    // OPTION 2: Make API call to verify admin status (more secure)
+    // Uncomment this if you implement an admin-check endpoint
+    /*
+    const adminCheck = await verifyAdminStatus(payload.user_id);
+    if (adminCheck) {
+      return true;
+    }
+    */
+
+    // OPTION 3: Check for admin role in payload (best practice)
+    // If your backend adds this later
+    if (payload.role === 'admin' || payload.is_admin) {
+      return true;
+    }
+
+    console.log("User is not admin");
+    return false;
+  } catch (error) {
+    console.error("Admin check failed:", error);
+    return false;
+  }
+}
+
+// API verification function (for Option 2)
+async function verifyAdminStatus(userId) {
+  try {
+    const response = await fetch(`/api/users/${userId}/admin-status`, {
+      headers: {
+        'Authorization': `Bearer ${getAuthToken()}`
+      }
+    });
+    return response.ok && (await response.json()).is_admin;
+  } catch (error) {
+    console.error("Admin verification failed:", error);
+    return false;
+  }
+}
+
+// Modified renderRecipes function with debug checks
+function renderRecipes() {
+  const container = document.querySelector(".recipe-cards-container");
+  if (!container) {
+    console.error("Recipe container not found!");
+    return;
+  }
+  container.innerHTML = "";
+
+  // Debug: Check admin status before rendering
+  console.group("Admin Status Check");
+  const adminStatus = isAdmin();
+  console.log("Current user is admin:", adminStatus);
+  console.groupEnd();
+
+  recipes.forEach(recipe => {
+    const card = document.createElement("div");
+    card.className = "recipe-card";
+    
+    // Recipe content
+    card.innerHTML = `
+      <img src="${recipe.image}" alt="${recipe.name}" 
+           onerror="this.src='../Images/default-recipe.jpg'">
+      <h3>${recipe.name}</h3>
+      <p>${recipe.description}</p>
+    `;
+
+    // Admin delete button
+    if (adminStatus) {
+      console.log(`Adding delete button for recipe ${recipe.id}`);
+      const deleteBtn = document.createElement("button");
+      deleteBtn.className = "admin-delete-btn visible";
+      deleteBtn.textContent = "Delete";
+      deleteBtn.onclick = async (e) => {
+        e.stopPropagation();
+        if (confirm("Delete this recipe permanently?")) {
+          await deleteRecipe(recipe.id);
+          recipes = recipes.filter(r => r.id !== recipe.id);
+          renderRecipes();
+        }
+      };
+      card.appendChild(deleteBtn);
+    }
+
+    container.appendChild(card);
+  });
 }
