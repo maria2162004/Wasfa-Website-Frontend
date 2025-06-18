@@ -13,6 +13,77 @@ document.addEventListener("DOMContentLoaded", async () => {
   // Check if current user is admin
   const isAdminUser = await checkIfAdmin();
 
+  // Cookie-based favorites functions
+  function getCurrentUserId() {
+    const accessToken = document.cookie
+      .split('; ')
+      .find(row => row.startsWith('access_token='))
+      ?.split('=')[1];
+    
+    if (!accessToken) return null;
+    
+    try {
+      const payload = accessToken.split('.')[1];
+      const decoded = JSON.parse(atob(payload));
+      return decoded.user_id;
+    } catch (e) {
+      console.error("Error decoding token:", e);
+      return null;
+    }
+  }
+
+  function getUserFavorites() {
+    const userId = getCurrentUserId();
+    if (!userId) return [];
+    
+    const cookieName = `user_${userId}_favorites`;
+    const cookie = document.cookie
+      .split('; ')
+      .find(row => row.startsWith(`${cookieName}=`));
+    
+    if (!cookie) return [];
+    
+    try {
+      return JSON.parse(cookie.split('=')[1]);
+    } catch (e) {
+      console.error("Error parsing favorites cookie:", e);
+      return [];
+    }
+  }
+
+  function setUserFavorites(recipeIds) {
+    const userId = getCurrentUserId();
+    if (!userId) return;
+    
+    const cookieName = `user_${userId}_favorites`;
+    const cookieValue = JSON.stringify(recipeIds);
+    const expiryDate = new Date();
+    expiryDate.setFullYear(expiryDate.getFullYear() + 1);
+    
+    document.cookie = `${cookieName}=${cookieValue}; expires=${expiryDate.toUTCString()}; path=/`;
+  }
+
+  function toggleFavorite(recipeId) {
+    const userId = getCurrentUserId();
+    if (!userId) {
+      alert("Please log in to save favorites");
+      return false;
+    }
+    
+    const currentFavorites = getUserFavorites();
+    const isFavorite = currentFavorites.includes(recipeId);
+    let newFavorites;
+    
+    if (isFavorite) {
+      newFavorites = currentFavorites.filter(id => id !== recipeId);
+    } else {
+      newFavorites = [...currentFavorites, recipeId];
+    }
+    
+    setUserFavorites(newFavorites);
+    return !isFavorite;
+  }
+
   fetch(API_URL)
     .then((response) => {
       if (!response.ok) {
@@ -67,7 +138,11 @@ document.addEventListener("DOMContentLoaded", async () => {
         editBtn.style.display = "none";
         favoriteBtn.style.display = "flex";
 
-        if (recipe.isFav) {
+        // Check if recipe is in user's favorites
+        const userFavorites = getUserFavorites();
+        const isFavorite = userFavorites.includes(recipe.id);
+
+        if (isFavorite) {
           favoriteBtn.innerHTML = '<i class="fas fa-heart"></i>';
           favoriteBtn.classList.add("favorited");
         } else {
@@ -76,40 +151,25 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
 
         favoriteBtn.addEventListener("click", () => {
-          const newFavStatus = !recipe.isFav;
-
-          fetch(API_URL, {
-            method: "PATCH",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ isFav: newFavStatus }),
-          })
-            .then((res) => res.json())
-            .then((updatedRecipe) => {
-              recipe.isFav = updatedRecipe.isFav;
-              if (recipe.isFav) {
-                favoriteBtn.innerHTML = '<i class="fas fa-heart"></i>';
-                favoriteBtn.classList.add("favorited");
-              } else {
-                favoriteBtn.innerHTML = '<i class="far fa-heart"></i>';
-                favoriteBtn.classList.remove("favorited");
-              }
-            })
-            .catch((error) => {
-              console.error("Error updating favourite status:", error);
-              alert("There was an error updating your favourite status.");
-            });
+          const newFavStatus = toggleFavorite(recipe.id);
+          
+          if (newFavStatus) {
+            favoriteBtn.innerHTML = '<i class="fas fa-heart"></i>';
+            favoriteBtn.classList.add("favorited");
+          } else {
+            favoriteBtn.innerHTML = '<i class="far fa-heart"></i>';
+            favoriteBtn.classList.remove("favorited");
+          }
         });
       }
 
       // Back button
-     const backBtn = document.getElementById("back-btn");
-if (backBtn) {
-  backBtn.addEventListener("click", () => {
-    window.location.href = "../HTML/Recipes.html";
-  });
-}
+      const backBtn = document.getElementById("back-btn");
+      if (backBtn) {
+        backBtn.addEventListener("click", () => {
+          window.location.href = "../HTML/Recipes.html";
+        });
+      }
     })
     .catch((error) => {
       alert("Recipe not found. Redirecting...");
