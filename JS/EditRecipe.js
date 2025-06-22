@@ -35,10 +35,13 @@ document.addEventListener("DOMContentLoaded", async () => {
       newRow.className = "ingredient-row";
       newRow.innerHTML = `
         <div class="input">
-          <input type="text" name="ingredientName[]" value="${ing.name}" required>
+          <input type="text" name="ingredientId[]" value="${ing.id || ""}" required />
         </div>
         <div class="input">
-          <input type="number" name="ingredientQuantity[]" value="${ing.quantity}" required>
+          <input type="text" name="ingredientName[]" value="${ing.name}" required />
+        </div>
+        <div class="input">
+          <input type="text" name="ingredientQuantity[]" value="${ing.quantity}" required />
         </div>
         <div class="input">
           <select name="ingredientUnit[]" required>
@@ -91,14 +94,14 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   }
 
-  // Image live preview
+  // Live image preview
   imageUrlInput.addEventListener("input", () => {
     const url = imageUrlInput.value.trim();
     photoPreview.src = url;
     photoPreview.style.display = url ? "block" : "none";
   });
 
-  // Handle submit (PATCH)
+  // Submit the updated recipe
   document.getElementById("recipeForm").addEventListener("submit", async (e) => {
     e.preventDefault();
 
@@ -116,6 +119,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const ingredients = [];
     document.querySelectorAll(".ingredient-row").forEach((row) => {
       ingredients.push({
+        id: row.querySelector('[name="ingredientId[]"]')?.value || null,
         name: row.querySelector('[name="ingredientName[]"]').value.trim(),
         quantity: parseFloat(row.querySelector('[name="ingredientQuantity[]"]').value),
         units: row.querySelector('[name="ingredientUnit[]"]').value,
@@ -157,5 +161,60 @@ document.addEventListener("DOMContentLoaded", async () => {
       console.error("Failed to update recipe:", error);
       alert("Failed to update recipe. Please check your input.");
     }
+  });
+
+  // 🔹 Add Step Button Logic
+  document.getElementById("addMethodBtn").addEventListener("click", () => {
+    const methodSection = document.getElementById("methodSection");
+
+    const newStep = document.createElement("div");
+    newStep.className = "method-step";
+    newStep.innerHTML = `
+      <div class="method-step-number">${methodSection.children.length + 1}</div>
+      <div class="method-step-content">
+        <textarea name="methodStep[]" placeholder="Enter step description" required></textarea>
+      </div>
+      <button type="button" class="remove-method-btn"><i class="fas fa-times"></i></button>
+    `;
+
+    newStep.querySelector(".remove-method-btn").addEventListener("click", () => {
+      newStep.remove();
+      updateMethodStepNumbers();
+    });
+
+    methodSection.appendChild(newStep);
+  });
+
+  // 🔹 Add Ingredient Button Logic
+  document.getElementById("add_ingredient_button").addEventListener("click", () => {
+    const ingredientSection = document.getElementById("ingredientSection");
+
+    const newRow = document.createElement("div");
+    newRow.className = "ingredient-row";
+    newRow.innerHTML = `
+      <div class="input">
+        <input type="text" name="ingredientId[]" placeholder="Ingredient ID" required />
+      </div>
+      <div class="input">
+        <input type="text" name="ingredientName[]" placeholder="Ingredient Name" required />
+      </div>
+      <div class="input">
+        <input type="text" name="ingredientQuantity[]" placeholder="Quantity" required />
+      </div>
+      <div class="input">
+        <select name="ingredientUnit[]" required>
+          <option value="grams">grams</option>
+          <option value="cups">cups</option>
+          <option value="ml">ml</option>
+          <option value="teaspoon">teaspoon</option>
+          <option value="tablespoon">tablespoon</option>
+          <option value="pieces">pieces</option>
+        </select>
+      </div>
+      <button type="button" class="remove-ingredient-btn"><i class="fas fa-times"></i></button>
+    `;
+
+    newRow.querySelector(".remove-ingredient-btn").addEventListener("click", () => newRow.remove());
+    ingredientSection.appendChild(newRow);
   });
 });

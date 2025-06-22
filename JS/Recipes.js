@@ -154,8 +154,6 @@ function renderRecipes() {
     });
 }
 
-// Rest of the functions remain the same (deleteRecipe, showCustomAlert, showCustomConfirm, checkIfAdmin)
-// ... (keep all the existing helper functions at the bottom)
 async function deleteRecipe(id) {
     try {
         const accessToken = document.cookie

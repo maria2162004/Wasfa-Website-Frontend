@@ -1,4 +1,4 @@
-// Reuse cookie functions from Recipes.js
+
 function getCurrentUserId() {
     const accessToken = document.cookie
         .split('; ')
