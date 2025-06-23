@@ -85,7 +85,8 @@ Follow these steps to run the website on your machine:
    ```
 
 ---
-
+ **[GitHub Repository for Backend](https://github.com/maria2162004/Wasfa-Website-Backend)** <img src="https://simpleicons.org/icons/github.svg" width="16">
+ **[GitHub Repository for Frontend](https://github.com/Shrouk-Sharaf/Wasfa-Front)** <img src="https://simpleicons.org/icons/github.svg" width="16">
 ## 📌 Notes
 - Make sure Django is installed and your environment is properly configured.
 - For production, consider replacing SQLite with PostgreSQL or MySQL.
